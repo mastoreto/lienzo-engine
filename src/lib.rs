@@ -1,6 +1,22 @@
-pub mod engine;
-pub mod entities;
-pub mod systems;
-pub mod inputs;
+mod engine;
+mod entities;
+mod inputs;
+mod systems;
+mod commands;
 
-pub use engine::start_engine;
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+pub fn start_engine() {
+    engine::start();
+}
+
+#[wasm_bindgen]
+pub fn update() {
+    engine::update();
+}
+
+#[wasm_bindgen]
+pub fn add_square(options: &JsValue) {
+    commands::add_square(options);
+}

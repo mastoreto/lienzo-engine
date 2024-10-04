@@ -1,34 +1,30 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use serde::Deserialize;
 
-#[derive(Component, Clone, Copy)]
-pub struct Position {
+#[derive(Deserialize, Clone)]
+pub struct SquareOptions {
     pub x: f32,
     pub y: f32,
-    pub z: f32,
+    pub size: f32,
+    pub color: String,
 }
 
-#[derive(Component)]
-pub struct Movable;
+pub fn spawn_square(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>, options: SquareOptions) {
+    let color = match options.color.to_lowercase().as_str() {
+        "red" => Color::RED,
+        "green" => Color::GREEN,
+        "blue" => Color::BLUE,
+        "yellow" => Color::YELLOW,
+        "purple" => Color::PURPLE,
+        _ => Color::WHITE,
+    };
 
-#[derive(Bundle)]
-pub struct EntityBundle {
-    pub position: Position,
-    pub movable: Movable,
-    pub sprite_bundle: SpriteBundle,
-}
-
-pub fn create_entity(commands: &mut Commands, position: Position) {
-    commands.spawn(EntityBundle {
-        position,
-        movable: Movable,
-        sprite_bundle: SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(100.0, 100.0)),  // Usamos `custom_size` en lugar de `size`
-                color: Color::srgb(0.5, 0.5, 1.0),
-                ..Default::default()
-            },
-            transform: Transform::from_xyz(position.x, position.y, 0.0).clone(),
-            ..Default::default()
-        },
+    commands.spawn(MaterialMesh2dBundle {
+        mesh: meshes
+            .add(Mesh::from(shape::Quad::new(Vec2::new(options.size, options.size))))
+            .into(),
+        material: materials.add(ColorMaterial::from(color)),
+        transform: Transform::from_translation(Vec3::new(options.x, options.y, 0.0)),
+        ..Default::default()
     });
 }
